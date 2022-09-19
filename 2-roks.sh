@@ -403,109 +403,79 @@ function installing-instana-server-components-routes {
 function installing-instana-server-components-patches-for-core {
   echo "----> installing-instana-server-components-patches-for-core"
 
+  # The patch string
+  local patch_string="[
+            {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
+          ]"
+
   # Acceptor
-  kubectl patch deployment/acceptor -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/acceptor -n instana-core --type "json" -p "${patch_string}"
 
   # appdata-health-aggregator
-  kubectl patch deployment/appdata-health-aggregator -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/appdata-health-aggregator -n instana-core --type "json" -p "${patch_string}"
 
   # appdata-health-processor
-  kubectl patch deployment/appdata-health-processor -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/appdata-health-processor -n instana-core --type "json" -p "${patch_string}"
 
   # appdata-reader
-  kubectl patch deployment/appdata-reader -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/appdata-reader -n instana-core --type "json" -p "${patch_string}"
 
   # appdata-writer
-  kubectl patch deployment/appdata-writer -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/appdata-writer -n instana-core --type "json" -p "${patch_string}"
 
   # butler
-  kubectl patch deployment/butler -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/butler -n instana-core --type "json" -p "${patch_string}"
 
   # cashier-ingest
-  kubectl patch deployment/cashier-ingest -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/cashier-ingest -n instana-core --type "json" -p "${patch_string}"
 
   # eum-acceptor
-  kubectl patch deployment/eum-acceptor -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/eum-acceptor -n instana-core --type "json" -p "${patch_string}"
 
   # eum-health-processor
-  kubectl patch deployment/eum-health-processor -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/eum-health-processor -n instana-core --type "json" -p "${patch_string}"
 
   # eum-processor
-  kubectl patch deployment/eum-processor -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/eum-processor -n instana-core --type "json" -p "${patch_string}"
 
   # groundskeeper
-  kubectl patch deployment/groundskeeper -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/groundskeeper -n instana-core --type "json" -p "${patch_string}"
 
   # js-stack-trace-translator
-  kubectl patch deployment/js-stack-trace-translator -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/js-stack-trace-translator -n instana-core --type "json" -p "${patch_string}"
 
   # serverless-acceptor
-  kubectl patch deployment/serverless-acceptor -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/serverless-acceptor -n instana-core --type "json" -p "${patch_string}"
 
   # serverless-acceptor
-  kubectl patch deployment/serverless-acceptor -n instana-core --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/serverless-acceptor -n instana-core --type "json" -p "${patch_string}"
 }
 
 function installing-instana-server-components-patches-for-units {
   echo "----> installing-instana-server-components-patches-for-units"
+  
+  # The patch string
+  local patch_string="[
+            {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
+          ]"
 
   # tu-tenant0-unit0-appdata-legacy-converter
-  kubectl patch deployment/tu-tenant0-unit0-appdata-legacy-converter -n instana-units --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/tu-tenant0-unit0-appdata-legacy-converter -n instana-units --type "json" -p "${patch_string}"
 
   # tu-tenant0-unit0-appdata-processor
-  kubectl patch deployment/tu-tenant0-unit0-appdata-processor -n instana-units --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/tu-tenant0-unit0-appdata-processor -n instana-units --type "json" -p "${patch_string}"
 
   # tu-tenant0-unit0-filler
-  kubectl patch deployment/tu-tenant0-unit0-filler -n instana-units --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/tu-tenant0-unit0-filler -n instana-units --type "json" -p "${patch_string}"
 
   # tu-tenant0-unit0-issue-tracker
-  kubectl patch deployment/tu-tenant0-unit0-issue-tracker -n instana-units --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/tu-tenant0-unit0-issue-tracker -n instana-units --type "json" -p "${patch_string}"
 
   # tu-tenant0-unit0-processor
-  kubectl patch deployment/tu-tenant0-unit0-processor -n instana-units --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/tu-tenant0-unit0-processor -n instana-units --type "json" -p "${patch_string}"
 
   # tu-tenant0-unit0-ui-backend
-  kubectl patch deployment/tu-tenant0-unit0-ui-backend -n instana-units --type "json" -p "[
-  {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-  ]"
+  kubectl patch deployment/tu-tenant0-unit0-ui-backend -n instana-units --type "json" -p "${patch_string}"
 }
 
 function how-to-access-instana-on-roks {

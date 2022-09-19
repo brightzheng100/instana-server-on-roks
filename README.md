@@ -19,7 +19,7 @@ The architecture can be illustrated as below:
 
 ## Overview
 
-Overall, there are two parts, once the [Preparation](#preparation) are met:
+Overall, there are two parts, once the [Infrastructure Preparation](#infrastructure-preparation) is done:
 
 1. [Part 1 - Deploying Instana Datastore Components on VM](#part-1---deploying-instana-datastore-components-on-vm)
 2. [Part 2 - Deploying Instana Backend Components on ROKS](#part-2---deploying-instana-backend-components-on-roks)
@@ -47,11 +47,14 @@ Please SSH into the VM for all below steps, with a user who can be `root` or a u
 
 You MUST install the proper version of `instana-console` to align the datastore components' versions with the ones required by `kubectl instana --version` in part 2, to avoid version mismatch. 
 
-So You should install Instana's `kubectl` plugin first, by following [this step](#installing-kubectl-plugin), and determine which version of `instana-console` should be installed in part 1. Otherwise a re-installation of Instana Datastore components might be required.
+So you should install Instana's `kubectl` plugin first, by following [this step](#installing-kubectl-plugin), and determine which version of `instana-console` should be installed in part 1.
+Otherwise a re-installation of Instana Datastore components might be required.
+
+Please see [Error: version requirements not met](#error-version-requirements-not-met) in the known issues for details.
 
 ### The TL;DR Guide for Part 1
 
-If you don't care about the details, clone the repo and run below commands within the repo root folder:
+If you don't care about the details, clone the repo and run below commands within the repo's root folder:
 
 ```sh
 # Update and set ALL required variables
@@ -66,7 +69,7 @@ mkdir _wip
 sudo -E ./1-vm.sh
 ```
 
-> Note: once you have successfully completed this step, please skip all steps in part 1 and proceed with part 2.
+> Note: once you have successfully completed this "The TL;DR Guide for Part 1", please skip all steps in part 1 and proceed directly with [Part 2 - Deploying Instana Backend Components on ROKS](#part-2---deploying-instana-backend-components-on-roks).
 
 
 ### Installing Docker
@@ -199,13 +202,13 @@ CONTAINER ID   IMAGE                                                            
 
 ## Part 2 - Deploying Instana Backend Components on ROKS
 
-You run walk through these steps in your laptop, as long as you can access ROKS.
+You may walk through these steps in your laptop, or anywhere you like, as long as you can access ROKS, with the desired tools installed.
 
 ### Overview
 
 Overall there are 3 major steps:
 
-1. [Preparation for Part 2](#installing-kubectl-plugin)
+1. [Preparation for Part 2](#preparation-for-part-2)
 2. [Installing Instana Operator](#installing-instana-operator)
 3. [Installing Instana Server Components](#installing-instana-server-components)
 
@@ -216,7 +219,7 @@ Once you have installed the `kubectl` plugin, the doc also offers a [The TL;DR G
 
 #### Instana Datastore Readiness Check
 
-But before you proceed, please have a check to make sure all required ports are opened.
+Before you proceed, please have a check to make sure all required ports are opened.
 
 For example:
 
@@ -242,7 +245,7 @@ Connection to 168.1.53.248 port 9092 [tcp/XmlIpcRegSvc] succeeded!
 
 #### Installing `kubectl` plugin
 
-Please visit the doc [here](https://www.ibm.com/docs/en/instana-observability/current?topic=premises-instana-kubectl-plug-in#manual-installation) to download the `kubectl` plugin and install it properly.
+Please visit the doc [here](https://www.ibm.com/docs/en/instana-observability/current?topic=premises-instana-kubectl-plug-in#manual-installation) to download the right `kubectl` plugin and install it properly.
 
 For examppe, this is my process when installing it in my MBP with M1 chip laptop.
 
@@ -267,7 +270,7 @@ beeinstana:         	Major:1 	min. Minor:134
 cockroachdb:        	Major:21 	min. Minor:1
 ```
 
-#### Export some required variables
+#### Export ALL required variables
 
 ```sh
 # Instana's agent key
@@ -288,7 +291,7 @@ export INSTANA_DATASTORE_HOST_FQDN="<INSTANA DATASTORE VM'S FQDN>"
 export INSTANA_DATASTORE_HOST_IP="<INSTANA DATASTORE VM'S PUBLIC IP>"
 ```
 
-> Note: For the `INSTANA_DATASTORE_HOST_FQDN`, you can retrieve it by running `hostname` in the previous Instana Datastore VM.
+> Note: For the `INSTANA_DATASTORE_HOST_FQDN`, the simplest way is to retrieve it by running `hostname` command in the previous Instana Datastore VM, or you may add an A record in your DNS system to map a FQDN to the VM's public IP.
 
 
 ### The TL;DR Guide for Part 2
@@ -329,6 +332,8 @@ How to access it? Try this:
 ```sh
 $ how-to-access-instana-on-roks
 ```
+
+> Note: once you have successfully completed this "The TL;DR Guide for Part 2", the installation of Instana on ROKS has been completely done. Read on only when you want to see how the detailed process looks like, or you really want to do that manually, step by step.
 
 ### Installing Instana Operator
 
@@ -916,7 +921,7 @@ This is due to long FQDN name, especially when you run it on public cloud, e.g. 
 
 So we need to make sure the `server_names_hash_bucket_size` is long enough, e.g. `256` instead of default `128`.
 
-To achieve that, please add the `componentConfigs` for `gateway` configs:
+To achieve that, please add the `componentConfigs` for `gateway` configs -- note: this change has been embedded within the process:
 
 ```yaml
 apiVersion: instana.io/v1beta2

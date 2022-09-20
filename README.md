@@ -204,8 +204,6 @@ CONTAINER ID   IMAGE                                                            
 
 You may walk through these steps in your laptop, or anywhere you like, as long as you can access ROKS, with the desired tools installed.
 
-### Overview
-
 Overall there are 3 major steps:
 
 1. [Preparation for Part 2](#preparation-for-part-2)
@@ -877,14 +875,14 @@ kubectl patch deployment/tu-tenant0-unit0-ui-backend -n instana-units --type "js
 ```
 
 
-### Known Issues & Solutions / Workarounds
+## Known Issues & Solutions / Workarounds
 
-#### The IP must be resolvable to a FQDN
+### The Instana Datastore VM's IP must be resolvable to a FQDN
 
 It's very straitforward if your Instana Datastore VM's IP is resolvable by a FQDN, otherwise please see all the patches of `/spec/template/spec/hostAliases` within impacted deployments.
 
 
-#### `gateway` Pod keeps crashing with error: could not build server_names_hash, you should increase server_names_hash_bucket_size: 128
+### `gateway` Pod keeps crashing with error: could not build server_names_hash, you should increase server_names_hash_bucket_size: 128
 
 This is due to long FQDN name, especially when you run it on public cloud, e.g. ROKS on IBM Cloud.
 
@@ -909,7 +907,7 @@ spec:
 
 This will make sure the `ConfigMap/gateway` in `instana-core` namespace has been properly changed.
 
-#### Error: version requirements not met
+### Error: version requirements not met
 
 If you can't see any pods created in namespace `instana-core` after applying the `core/instana-core` object, there must be some errors in the operator where you can check it out by:
 

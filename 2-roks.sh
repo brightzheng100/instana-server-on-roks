@@ -272,7 +272,7 @@ function installing-instana-server-components-core {
   sleep 60
 
   # Create the `instana-core` CR object
-  BASE_DOMAIN="`kubectl -n openshift-ingress get route/router-default --template '{{.spec.host}}' | sed s/router-default.//`" && \
+  BASE_DOMAIN="`kubectl get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.status.domain}'`" && \
   kubectl apply -f - <<EOF
 apiVersion: instana.io/v1beta2
 kind: Core

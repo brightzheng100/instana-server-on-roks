@@ -1,8 +1,8 @@
 # Instana Server on ROKS
 
-Instana offers SaaS by default, and also offers flexible non-SaaS deployment patterns, where we can deploy it within a single VM, dual-VM, or even Kubernetes.
+Instana offers SaaS by default, and also offers flexible non-SaaS deployment patterns, so we can deploy it within a single VM, dual-VM, or even Kubernetes.
 
-TechZone is IBM's killer sandbox where IBMers and its Business Partners can easily provision a VM, a Kubernetes/OpenShift cluster, or even a very complex environment on demand for purposes like self-learning, POC/POV.
+TechZone is IBM's killer sandbox where IBMers and its Business Partners can easily provision a VM, a Kubernetes/OpenShift cluster, or even a very complex environment on demand for purposes like self-learning, POCs/POVs.
 RedHat OpenShift Kubernetes Service (ROKS) is one of the most demanding services on IBM Cloud, which can be provisioned too through TechZone, on demand.
 
 This doc offers an end-to-end guide for how to deploy Instana backend components on:
@@ -10,11 +10,11 @@ This doc offers an end-to-end guide for how to deploy Instana backend components
 - 1 x ROKS cluster: 3 x Worker Nodes, each with 8vCPU, 32G RAM, and 100G Disk
 - 1 x VM: 16vCPU, 64G RAM
 
-> Note: I'm using OCP v4.10.x and RHEL v8.6 but different minor versions may work too.
+> Note: In this experiment I used OCP v4.10.x and RHEL v8.6 but different versions may work too.
 
 The architecture can be illustrated as below:
 
-![Architecture of Instana on ROKS + VM on IBM Cloud](./misc/architecture.png)
+![Architecture of Instana Server on ROKS](./misc/architecture.png)
 
 
 ## Overview
@@ -39,6 +39,7 @@ Please reach out to #itz-techzone-support to open below ports for the VM:
 - 9300 - ElasticSearch
 - 9092 - Kafka
 
+
 ## Part 1 - Deploying Instana Datastore Components on VM
 
 Please SSH into the VM for all below steps, with a user who can be `root` or a user with `sudo` permission.
@@ -52,24 +53,27 @@ Otherwise a re-installation of Instana Datastore components might be required.
 
 Please see [Error: version requirements not met](#error-version-requirements-not-met) in the known issues for details.
 
-### The TL;DR Guide for Part 1
-
-If you don't care about the details, clone the repo and run below commands within the repo's root folder:
+Now please prepare and set ALL required variables:
 
 ```sh
-# Update and set ALL required variables
+# Set ALL required variables
 export INSTANA_DATASTORE_HOST="<THE PUBLIC FQDN OR IP OF THE VM>"
 export INSTANA_AGENT_KEY="<THE INSTANA AGENT KEY>"
 export INSTANA_VERSION="<THE INSTANA VERSION, e.g. 231-1>"
 
 # Make a temp folder which will be ignored by the Git
 mkdir _wip
+```
 
-# Then run it
+### The TL;DR Guide for Part 1
+
+If you don't care about the details, clone the repo and run below commands within the repo's root folder:
+
+```sh
 sudo -E ./1-vm.sh
 ```
 
-> Note: once you have successfully completed this "The TL;DR Guide for Part 1", please skip all steps in part 1 and proceed directly with [Part 2 - Deploying Instana Backend Components on ROKS](#part-2---deploying-instana-backend-components-on-roks).
+> Note: once you have successfully completed this "**The TL;DR Guide for Part 1**", please skip all steps in part 1 and proceed directly with [Part 2 - Deploying Instana Backend Components on ROKS](#part-2---deploying-instana-backend-components-on-roks). Or read on to see what exactly has been done within this TL;DL guide with step-by-step details.
 
 
 ### Installing Docker
@@ -150,8 +154,6 @@ sudo dnf versionlock add instana-console
 
 ```sh
 # Prepare the settings file
-INSTANA_DATASTORE_HOST="<THE PUBLIC FQDN OR IP OF THE VM>" && \
-INSTANA_AGENT_KEY="<THE INSTANA AGENT KEY>" && \
 cat <<EOF | sudo tee _wip/db-settings.hcl
 type        = "single-db"
 host_name   = "${INSTANA_DATASTORE_HOST}"
@@ -299,7 +301,7 @@ But you can try out the offered script too to make things easier.
 
 After exporting the required abovementioned variables, we can run through these "commands", well, actually they're custom functions, line by line.
 
-> Note: even we can run all these in some shot, I'd strongly recommend you do that command by command so that you have a better chance to fix the potential issues before proceeding.
+> Note: even we can run all these in some shot, I'd strongly recommend you do that command by command so that you have a better chance to fix the potential issues before proceeding. And you may need to wait for a while, or have a retry, between the commands as some commands really take some time to finish.
 
 ```sh
 # Source the file
@@ -323,7 +325,7 @@ installing-instana-server-components-patches-for-core
 installing-instana-server-components-patches-for-units
 ```
 
-It may take a while, say roughly 30mins, to be fully ready and you should be able to see Pods created in both namespace "instana-core" and "instana-units".
+It may take a while, say roughly 15-30 mins, to be fully ready and you should be able to see Pods created in both namespace "instana-core" and "instana-units".
 
 How to access it? Try this:
 
@@ -331,7 +333,7 @@ How to access it? Try this:
 $ how-to-access-instana-on-roks
 ```
 
-> Note: once you have successfully completed this "The TL;DR Guide for Part 2", the installation of Instana on ROKS has been completely done. Read on only when you want to see how the detailed process looks like, or you really want to do that manually, step by step.
+> Note: once you have successfully completed this "The TL;DR Guide for Part 2", the installation of Instana on ROKS has been completely done. Read on only when you want to see how the detailed process looks like for part 2, or you really want to do that manually, step by step.
 
 ### Installing Instana Operator
 
@@ -355,7 +357,7 @@ $ kubectl create secret docker-registry instana-registry \
 
 #### Installing Cert Manager
 
-You may follow OpenShift's official doc to install [`cert-manager-operator`](https://docs.openshift.com/container-platform/4.10/security/cert_manager_operator/cert-manager-operator-install.html) instead.
+You may follow OpenShift's [official doc](https://docs.openshift.com/container-platform/4.10/security/cert_manager_operator/cert-manager-operator-install.html) to install [`cert-manager-operator`](https://cert-manager.io/docs/) instead.
 But for simplicity, let's try this one-liner installation of Cert Manager.
 
 ```sh
@@ -374,8 +376,8 @@ imagePullSecrets:
   - name: instana-registry
 EOF
 
-# Optional, generate the yaml files for learning purposes
-# kubectl instana operator template --output-dir operator --values instana-operator-values.yaml
+# Optionally, generate the yaml files for learning purposes
+# kubectl instana operator template --output-dir _wip/operator --values _wip/instana-operator-values.yaml
 
 # Apply the Instana Operator
 $ kubectl instana operator apply \
@@ -410,10 +412,11 @@ validatingwebhookconfigurations/instana-operator-webhook-validating created
 
 #### Namespaces: `instana-core` and `instana-units`
 
+Create two namespaces:
+- `instana-core`: for Instana's foundational components
+- `instana-units`: for Instana's tenants and units
+
 ```sh
-# Create two namespaces:
-# - instana-core: for Instana's foundational components
-# - instana-units: for Instana's tenants and units
 $ kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Namespace
@@ -655,11 +658,11 @@ $ kubectl patch deployment/instana-operator -n instana-operator --type "json" -p
 ]"
 ```
 
-While for a while for the readiness of Instana operator recreation, then create the `instana-core` CR object.
+Wait for a while for the readiness of Instana operator recreation, then create the `instana-core` CR object.
 
 ```sh
 # Create the `instana-core` CR object
-$ BASE_DOMAIN="`kubectl -n openshift-ingress get route/router-default --template '{{.spec.host}}' | sed s/router-default.//`" && \
+$ BASE_DOMAIN="`kubectl get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.status.domain}'`" && \
   kubectl apply -f - <<EOF
 apiVersion: instana.io/v1beta2
 kind: Core
@@ -772,12 +775,12 @@ EOF
 
 ```sh
 # Create routes for gateway
-$ oc create route passthrough instana-gateway \
+$ kubectl create route passthrough instana-gateway \
   --hostname="`kubectl get core/instana-core -n instana-core -o jsonpath='{.spec.baseDomain}'`" \
   --service=gateway \
   --port=https \
   -n instana-core
-$ oc create route passthrough instana-gateway-unit0-tenant0 \
+$ kubectl create route passthrough instana-gateway-unit0-tenant0 \
   --hostname="unit0-tenant0.`kubectl get core/instana-core -n instana-core -o jsonpath='{.spec.baseDomain}'`" \
   --service=gateway \
   --port=https \
@@ -788,7 +791,7 @@ $ oc create route passthrough instana-gateway-unit0-tenant0 \
 
 ```sh
 # Create routes for acceptor
-$ oc create route passthrough instana-acceptor \
+$ kubectl create route passthrough instana-acceptor \
   --hostname="`kubectl get core/instana-core -n instana-core -o jsonpath='{.spec.agentAcceptorConfig.host}'`" \
   --service=acceptor \
   --port=http-service \
@@ -796,6 +799,8 @@ $ oc create route passthrough instana-acceptor \
 ```
 
 #### Patch all pods where Kafka client is used
+
+> Note: this is due to the IP resolution issue we discussed eariler, or see the known issue [here](#the-instana-datastore-vms-ip-must-be-resolvable-to-a-fqdn)
 
 1. Prepare the patch string:
 

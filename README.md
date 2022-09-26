@@ -765,7 +765,7 @@ spec:
   unitName: unit0
 
   # The same rules apply as for Cores. May be ommitted. Default is 'medium'
-  resourceProfile: medium
+  resourceProfile: small
 EOF
 ```
 
@@ -775,12 +775,12 @@ EOF
 
 ```sh
 # Create routes for gateway
-$ kubectl create route passthrough instana-gateway \
+$ oc create route passthrough instana-gateway \
   --hostname="`kubectl get core/instana-core -n instana-core -o jsonpath='{.spec.baseDomain}'`" \
   --service=gateway \
   --port=https \
   -n instana-core
-$ kubectl create route passthrough instana-gateway-unit0-tenant0 \
+$ oc create route passthrough instana-gateway-unit0-tenant0 \
   --hostname="unit0-tenant0.`kubectl get core/instana-core -n instana-core -o jsonpath='{.spec.baseDomain}'`" \
   --service=gateway \
   --port=https \
@@ -791,7 +791,7 @@ $ kubectl create route passthrough instana-gateway-unit0-tenant0 \
 
 ```sh
 # Create routes for acceptor
-$ kubectl create route passthrough instana-acceptor \
+$ oc create route passthrough instana-acceptor \
   --hostname="`kubectl get core/instana-core -n instana-core -o jsonpath='{.spec.agentAcceptorConfig.host}'`" \
   --service=acceptor \
   --port=http-service \

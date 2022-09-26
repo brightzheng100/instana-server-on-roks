@@ -879,6 +879,30 @@ kubectl patch deployment/tu-tenant0-unit0-processor -n instana-units --type "jso
 kubectl patch deployment/tu-tenant0-unit0-ui-backend -n instana-units --type "json" -p "${patch_string}"
 ```
 
+### How to Access Instana?
+
+Once you've reached here and after all Pods in namespaces of `instana-core`, `instana-units` are in `running` state, the installation of Instana Server on ROKS is done.
+
+You may run this to print out the info for how to access the Instana UI:
+
+```sh
+echo "You should be able to acdess Instana UI by:"
+echo " - URL: https://`oc get route -n instana-core instana-gateway -o jsonpath='{.spec.host}'`"
+echo " - USER: ${INSTANA_ADMIN_USER}"
+echo " - PASSWORD: ${INSTANA_ADMIN_PWD}"
+```
+
+The output might be something like:
+
+```log
+You should be able to acdess Instana UI by:
+ - URL: https://instana.xxx.containers.appdomain.cloud
+ - USER: admin@instana.local
+ - PASSWORD: Passw0rd
+```
+
+That's it and enjoy the full-stack observability offered by Instana, on ROKS!
+
 
 ## Known Issues & Solutions / Workarounds
 

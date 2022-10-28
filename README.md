@@ -84,6 +84,10 @@ export INSTANA_VERSION="<THE INSTANA VERSION, e.g. 235-1, see point 1 above>"
 export INSTANA_DATASTORE_HOST="<THE FQDN OR IP OF THE VM, e.g. 168.1.53.253, see point 2 above>"
 export INSTANA_AGENT_KEY="<THE INSTANA AGENT KEY>"
 
+# Git clone the repo so that we have the scripts
+git clone https://github.com/brightzheng100/instana-server-on-roks.git
+cd instana-server-on-roks
+
 # Make a temp folder which will be ignored by the Git
 mkdir _wip
 ```

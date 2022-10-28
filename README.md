@@ -46,6 +46,8 @@ Please SSH into the VM for all below steps, with a user who can be `root` or a u
 
 ### Preparation for Part 1
 
+**1. Determine the use the right version of Instana with right `instana-console`**
+
 You MUST install the proper version of `instana-console` to align the datastore components' versions with the ones required by `kubectl instana --version` in part 2, to avoid version mismatch. 
 
 So you should install Instana's `kubectl` plugin first, by following [this step](#installing-kubectl-plugin), and determine which version of `instana-console` should be installed in part 1.
@@ -53,13 +55,34 @@ Otherwise a re-installation of Instana Datastore components might be required.
 
 Please see [Error: version requirements not met](#error-version-requirements-not-met) in the known issues for details.
 
-Now please prepare and set ALL required variables:
+This is to make sure we're setting the proper `INSTANA_VERSION` variable.
+
+**2. Expose the datastore VM properly**
+
+There might be different scenarios while exposing the datastore VM:
+- Public IP, or dummy FQDN with `.nip.io`. If you're on IBM Cloud classic VM, there will be both private and public IPs attached, so use directly the public IP is fine to set the `INSTANA_DATASTORE_HOST` variable, or use a dummy FQDN like `<IP>.nip.io` where the `<IP>` is exactly the public IP
+- Private IP in VPC together with ROKS. In this case, since the private IP is accessible by the VPC-based ROKS, either using the private IP, or a dummy FQDN is totally fine
+- Private IP in VPC while ROKS is outside of VPC. In this case, the floating IP might not be visible from the VM so you have to export the `INSTANA_DATASTORE_HOST` variable using the private IP, while using the dummy `.nip.io` FQDN to map to the floating IP.
+
+Anyway, if you don't have a proper FQDN, do create a dummy one like this:
+
+```sh
+# The <IP> should be the one exposed to and accessed by the Instana backend components
+# - Use public IP in classic datastore VM
+# - Use private IP when both datastore VM and ROKS are in the same VPC
+# - Use floating IP when datastore VM is in VPC while ROKS is outside of VPC
+sudo hostnamectl set-hostname <IP>.nip.io
+```
+
+**3. Set and export the variables**
+
+Okay, now please prepare and set ALL required variables:
 
 ```sh
 # Set ALL required variables
-export INSTANA_DATASTORE_HOST="<THE PUBLIC FQDN OR IP OF THE VM>"
+export INSTANA_VERSION="<THE INSTANA VERSION, e.g. 235-1, see point 1 above>"
+export INSTANA_DATASTORE_HOST="<THE FQDN OR IP OF THE VM, e.g. 168.1.53.253, see point 2 above>"
 export INSTANA_AGENT_KEY="<THE INSTANA AGENT KEY>"
-export INSTANA_VERSION="<THE INSTANA VERSION, e.g. 231-1>"
 
 # Make a temp folder which will be ignored by the Git
 mkdir _wip
@@ -135,13 +158,14 @@ sudo dnf makecache
 # Check available versions and pick the right one
 # You may see something like this:
 #...
-#instana-console.x86_64    231-0       instana-product
-#instana-console.x86_64    231-1       instana-product
-#instana-console.x86_64    233-0       instana-product
+#instana-console.x86_64    233-2       instana-product
+#instana-console.x86_64    235-0       instana-product
+#instana-console.x86_64    235-1       instana-product
+#instana-console.x86_64    235-2       instana-product
 sudo dnf --showduplicates list instana-console
 
 # Replace the <INSTANA-VERSION> with the right version
-# For example: sudo dnf install -y instana-console-231-1
+# For example: sudo dnf install -y instana-console-235-1
 sudo dnf install -y instana-console-<INSTANA-VERSION>
 
 instana version
@@ -192,19 +216,19 @@ Once it's done, the part 1 is completed and we can verify it by:
 
 ```sh
 $ docker ps
-CONTAINER ID   IMAGE                                                                        COMMAND                  CREATED          STATUS                    PORTS     NAMES
-6536c1cdd35e   containers.instana.io/instana/release/product/cassandra:4.0.3_v0.39.0        "/docker-entrypoint.…"   47 minutes ago   Up 47 minutes (healthy)             instana-cassandra
-4da47f20078c   containers.instana.io/instana/release/product/kafka:3.2.0_v0.49.0            "/docker-entrypoint.…"   47 minutes ago   Up 47 minutes (healthy)             instana-kafka
-1de9786949fb   containers.instana.io/instana/release/product/cockroachdb:21.1.7_v0.28.0     "/docker-entrypoint.…"   47 minutes ago   Up 47 minutes (healthy)             instana-cockroachdb
-6d0f45ab7f05   containers.instana.io/instana/release/product/elasticsearch:7.16.3_v0.13.0   "/docker-entrypoint.…"   47 minutes ago   Up 47 minutes (healthy)             instana-elastic
-70f5d0ecbd93   containers.instana.io/instana/release/product/clickhouse:21.3.19.1_v0.35.0   "/docker-entrypoint.…"   47 minutes ago   Up 47 minutes (healthy)             instana-clickhouse
-9b78cd1e8582   containers.instana.io/instana/release/product/zookeeper:3.7.1_v0.36.0        "/docker-entrypoint.…"   47 minutes ago   Up 47 minutes (healthy)             instana-zookeeper
+CONTAINER ID   IMAGE                                                                         COMMAND                  CREATED          STATUS                    PORTS     NAMES
+c7d824125c40   containers.instana.io/instana/release/product/cassandra:4.0.3_v0.51.0         "/docker-entrypoint.…"   13 minutes ago   Up 13 minutes (healthy)             instana-cassandra
+3585d2b73c14   containers.instana.io/instana/release/product/clickhouse:22.3.12.19_v0.53.0   "/docker-entrypoint.…"   13 minutes ago   Up 13 minutes (healthy)             instana-clickhouse
+31604a26c7d9   containers.instana.io/instana/release/product/elasticsearch:7.16.3_v0.47.0    "/docker-entrypoint.…"   13 minutes ago   Up 13 minutes (healthy)             instana-elastic
+bf4502887e1e   containers.instana.io/instana/release/product/cockroachdb:21.1.7_v0.41.0      "/docker-entrypoint.…"   13 minutes ago   Up 13 minutes (healthy)             instana-cockroachdb
+e9bcb35e15c6   containers.instana.io/instana/release/product/kafka:3.2.0_v0.57.0             "/docker-entrypoint.…"   13 minutes ago   Up 13 minutes (healthy)             instana-kafka
+830bdba16b81   containers.instana.io/instana/release/product/zookeeper:3.7.1_v0.44.0         "/docker-entrypoint.…"   14 minutes ago   Up 14 minutes (healthy)             instana-zookeeper
 ```
 
 
 ## Part 2 - Deploying Instana Backend Components on ROKS
 
-You may walk through these steps in your laptop, or anywhere you like, as long as you can access ROKS, with the desired tools installed.
+You may walk through these steps in your laptop, or anywhere you like, as long as you can access ROKS and have logged into it as `ClusterAdmin`, with the desired tools installed.
 
 Overall there are 3 major steps:
 
@@ -251,23 +275,23 @@ For examppe, this is my process when installing it in my MBP with M1 chip laptop
 
 ```sh
 cd ~/Downloads
-tar -xvf kubectl-instana-darwin_arm64-release-231-0.tar.gz
+tar -xvf kubectl-instana-darwin_arm64-release-235-1.tar.gz
 sudo cp kubectl-instana /usr/local/bin/
 ```
 
-We can then verify that:
+We can then verify that -- in my case, as shown below, it's on `235-1` version of Instana:
 
 ```sh
 $ kubectl instana --version
-kubectl-instana version 231-0 (commit=7866b2a437d047ed1c6dad390535cdc13f5d46c7, date=2022-08-22T15:39:42Z, image=, branch=release)
+kubectl-instana version 235-1 (commit=67a2128239e0d6321a164ac149064bd8c8791db4, date=2022-10-20T11:30:20Z, image=, branch=release)
 
 Minimum required database versions:
-kafka:              	Major:3 	min. Minor:1
+beeinstana:         	Major:1 	min. Minor:160
+cockroachdb:        	Major:21 	min. Minor:1
+kafka:              	Major:3 	min. Minor:2
 elasticsearch:      	Major:7 	min. Minor:16
 cassandra:          	Major:4 	min. Minor:0
-clickhouse:         	Major:21 	min. Minor:3
-beeinstana:         	Major:1 	min. Minor:134
-cockroachdb:        	Major:21 	min. Minor:1
+clickhouse:         	Major:22 	min. Minor:3
 ```
 
 #### Export ALL required variables
@@ -286,9 +310,9 @@ export INSTANA_ADMIN_PWD="Passw0rd"
 # RWX-based storage class for spans
 export SPANS_STORAGE_CLASS="ibmc-file-gold-gid"
 # Instana's datastore VM's FQDN, see below note for how
-export INSTANA_DATASTORE_HOST_FQDN="<INSTANA DATASTORE VM'S FQDN>"
+export INSTANA_DATASTORE_HOST_FQDN="<INSTANA DATASTORE VM'S FQDN, e.g 168.1.53.248.nip.io>"
 # Instana's datastore VM's public IP
-export INSTANA_DATASTORE_HOST_IP="<INSTANA DATASTORE VM'S PUBLIC IP>"
+export INSTANA_DATASTORE_HOST_IP="<INSTANA DATASTORE VM'S EXPOSED IP, e.g 168.1.53.248>"
 ```
 
 > Note: For the `INSTANA_DATASTORE_HOST_FQDN`, the simplest way is to retrieve it by running `hostname` command in the previous Instana Datastore VM, or you may add an A record in your DNS system to map a FQDN to the VM's public IP.
@@ -318,11 +342,6 @@ installing-instana-server-components-pvc-spans
 installing-instana-server-components-core
 installing-instana-server-components-unit
 installing-instana-server-components-routes
-
-# Apply patches due to the known issue: The IP must be resolvable to a FQDN
-# Please make sure the pods in namespace "instana-core" and "instana-units" are being created, or have been created, before patching them. This is to make sure the deployments are already created
-installing-instana-server-components-patches-for-core
-installing-instana-server-components-patches-for-units
 ```
 
 It may take a while, say roughly 15-30 mins, to be fully ready and you should be able to see Pods created in both namespace "instana-core" and "instana-units".
@@ -630,36 +649,6 @@ EOF
 
 #### Creating Core object
 
-Important note: the DataStore VM must be resolveable to a FQDN.
-In IBM Cloud, the VM provisioned doesn't have a FQDN like AWS EC2 does.
-In this case, we have two options to make it work:
-
-1. Configure your DNS to add an A record so to have a FQDN pointing to the DataStore VM' IP;
-2. Manipulate the ROKS so that:
-   a. we may influence the cluster DNS by adding something like `hosts` plugin;
-   b. to patch the impacted CR / deployment object with `hostAliases`.
-
-In my case, I adopted the `2.b` option as I don't have a handy DNS provider account, and I'm not sure whether OpenShift supports `hosts` plugin either.
-
-For option `2.b`, do this:
-
-```sh
-# 1. Log into your Datastore VM and check it's hostname
-# which should look like this:
-[itzuser@itz-550004ghs4-ibcl ~]$ hostname
-itz-550004ghs4-ibcl.dte.demo.ibmcloud.com
-
-# 2. Get your public IP for your VM on IBM Cloud
-# In my case, it's 168.1.53.216
-
-# 3. Patch the Instana operator's deployment
-$ kubectl patch deployment/instana-operator -n instana-operator --type "json" -p "[
-{\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-]"
-```
-
-Wait for a while for the readiness of Instana operator recreation, then create the `instana-core` CR object.
-
 ```sh
 # Create the `instana-core` CR object
 $ BASE_DOMAIN="`kubectl get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.status.domain}'`" && \
@@ -739,7 +728,10 @@ spec:
 EOF
 ```
 
-> Note: this will take some time to finish. You may trace the events by: `kg events -n instana-core -w`
+> Note: this will take some time to finish. You may trace the events by: 
+> - Looking at the events: `oc get events -n instana-core -w`
+> - And even tracing the operator logs: `oc logs deployment/instana-operator -n instana-operator -f`
+
 
 #### Create Unit object
 
@@ -798,87 +790,6 @@ $ oc create route passthrough instana-acceptor \
   -n instana-core
 ```
 
-#### Patch all pods where Kafka client is used
-
-> Note: this is due to the IP resolution issue we discussed eariler, or see the known issue [here](#the-instana-datastore-vms-ip-must-be-resolvable-to-a-fqdn)
-
-1. Prepare the patch string:
-
-```sh
-# The patch string
-$ patch_string="[
-{\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-]"
-```
-
-2. The pods in `instana-core` namespace:
-
-```sh
-# Acceptor
-kubectl patch deployment/acceptor -n instana-core --type "json" -p "${patch_string}"
-
-# appdata-health-aggregator
-kubectl patch deployment/appdata-health-aggregator -n instana-core --type "json" -p "${patch_string}"
-
-# appdata-health-processor
-kubectl patch deployment/appdata-health-processor -n instana-core --type "json" -p "${patch_string}"
-
-# appdata-reader
-kubectl patch deployment/appdata-reader -n instana-core --type "json" -p "${patch_string}"
-
-# appdata-writer
-kubectl patch deployment/appdata-writer -n instana-core --type "json" -p "${patch_string}"
-
-# butler
-kubectl patch deployment/butler -n instana-core --type "json" -p "${patch_string}"
-
-# cashier-ingest
-kubectl patch deployment/cashier-ingest -n instana-core --type "json" -p "${patch_string}"
-
-# eum-acceptor
-kubectl patch deployment/eum-acceptor -n instana-core --type "json" -p "${patch_string}"
-
-# eum-health-processor
-kubectl patch deployment/eum-health-processor -n instana-core --type "json" -p "${patch_string}"
-
-# eum-processor
-kubectl patch deployment/eum-processor -n instana-core --type "json" -p "${patch_string}"
-
-# groundskeeper
-kubectl patch deployment/groundskeeper -n instana-core --type "json" -p "${patch_string}"
-
-# js-stack-trace-translator
-kubectl patch deployment/js-stack-trace-translator -n instana-core --type "json" -p "${patch_string}"
-
-# serverless-acceptor
-kubectl patch deployment/serverless-acceptor -n instana-core --type "json" -p "${patch_string}"
-
-# serverless-acceptor
-kubectl patch deployment/serverless-acceptor -n instana-core --type "json" -p "${patch_string}"
-```
-
-2. The pods in `instana-units` namespace:
-
-```sh
-# tu-tenant0-unit0-appdata-legacy-converter
-kubectl patch deployment/tu-tenant0-unit0-appdata-legacy-converter -n instana-units --type "json" -p "${patch_string}"
-
-# tu-tenant0-unit0-appdata-processor
-kubectl patch deployment/tu-tenant0-unit0-appdata-processor -n instana-units --type "json" -p "${patch_string}"
-
-# tu-tenant0-unit0-filler
-kubectl patch deployment/tu-tenant0-unit0-filler -n instana-units --type "json" -p "${patch_string}"
-
-# tu-tenant0-unit0-issue-tracker
-kubectl patch deployment/tu-tenant0-unit0-issue-tracker -n instana-units --type "json" -p "${patch_string}"
-
-# tu-tenant0-unit0-processor
-kubectl patch deployment/tu-tenant0-unit0-processor -n instana-units --type "json" -p "${patch_string}"
-
-# tu-tenant0-unit0-ui-backend
-kubectl patch deployment/tu-tenant0-unit0-ui-backend -n instana-units --type "json" -p "${patch_string}"
-```
-
 ### How to Access Instana?
 
 Once you've reached here and after all Pods in namespaces of `instana-core`, `instana-units` are in `running` state, the installation of Instana Server on ROKS is done.
@@ -904,12 +815,20 @@ You should be able to acdess Instana UI by:
 That's it and enjoy the full-stack observability offered by Instana, on ROKS!
 
 
+
 ## Known Issues & Solutions / Workarounds
 
 ### The Instana Datastore VM's IP must be resolvable to a FQDN
 
-It's very straitforward if your Instana Datastore VM's IP is resolvable by a FQDN, otherwise please see all the patches of `/spec/template/spec/hostAliases` within impacted deployments.
+There is a need to make sure the datastore VM's IP is resolvable by a FQDN.
+But adopting the dummy `.nip.io` can simplify this, so do consider this approach when applicable.
 
+Such approach has been captured in the [preparation](#preparation-for-part-1) of part 1, by simply doing something like:
+
+```sh
+# The <IP> should be the one exposed to and accessible by the Instana backend components
+sudo hostnamectl set-hostname <IP>.nip.io
+```
 
 ### `gateway` Pod keeps crashing with error: could not build server_names_hash, you should increase server_names_hash_bucket_size: 128
 

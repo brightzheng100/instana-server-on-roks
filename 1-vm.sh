@@ -101,9 +101,9 @@ EOF
 if [ -z "${INSTANA_DATASTORE_HOST}" ] | [ -z "${INSTANA_AGENT_KEY}" ]; then 
   echo "ERROR: You must export ALL required variables prior to run the command. For example"
   echo "==========================================================="
-  echo "export INSTANA_DATASTORE_HOST=\"168.1.53.216\""
+  echo "export INSTANA_DATASTORE_HOST=\"168.1.53.253\""
   echo "export INSTANA_AGENT_KEY=\"xxxxxxxxxxxxxxx\""
-  echo "export INSTANA_VERSION=\"231-1\""
+  echo "export INSTANA_VERSION=\"235-1\""
   return 1;
 fi
 
@@ -117,4 +117,4 @@ echo "----> INSTANA_VERSION=${INSTANA_VERSION}"
 installing-docker
 installing-instana-cli "${INSTANA_VERSION}"
 installing-instana-components "${INSTANA_DATASTORE_HOST}" "${INSTANA_AGENT_KEY}"
-echo "----> DONE! And you can proceed to part 2 now."
+echo "----> DONE! If no errors occured, you may proceed to part 2 now."

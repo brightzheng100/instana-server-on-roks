@@ -262,15 +262,6 @@ EOF
 function installing-instana-server-components-core {
   echo "----> installing-instana-server-components-core"
 
-  # Patch the Instana operator's deployment
-  kubectl patch deployment/instana-operator -n instana-operator --type "json" -p "[
-    {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
-    ]"
-  
-  # Wait for a while for the readiness of Instana operator recreation
-  echo "----> wait for 60 seconds"
-  sleep 60
-
   # Create the `instana-core` CR object
   BASE_DOMAIN="`kubectl get ingresscontroller default -n openshift-ingress-operator -o jsonpath='{.status.domain}'`" && \
   kubectl apply -f - <<EOF
@@ -400,6 +391,7 @@ function installing-instana-server-components-routes {
     -n instana-core
 }
 
+## No more required as we're using dummy .nip.io FQDN
 function installing-instana-server-components-patches-for-core {
   echo "----> installing-instana-server-components-patches-for-core"
 
@@ -451,6 +443,7 @@ function installing-instana-server-components-patches-for-core {
   kubectl patch deployment/serverless-acceptor -n instana-core --type "json" -p "${patch_string}"
 }
 
+## No more required as we're using dummy .nip.io FQDN
 function installing-instana-server-components-patches-for-units {
   echo "----> installing-instana-server-components-patches-for-units"
   
@@ -549,7 +542,6 @@ echo "----> INSTANA_DATASTORE_HOST_IP=${INSTANA_DATASTORE_HOST_IP}"
 # installing-instana-server-components-core
 # installing-instana-server-components-unit
 # installing-instana-server-components-routes
-# installing-instana-server-components-patches
 echo "==========================================================="
 echo "----> NOW IT'S READY TO ROCK!"
 echo "----> Note: even you may run below functions in one shot, I'd highly recommend you run them one by one:"
@@ -564,8 +556,6 @@ echo "installing-instana-server-components-pvc-spans"
 echo "installing-instana-server-components-core"
 echo "installing-instana-server-components-unit"
 echo "installing-instana-server-components-routes"
-echo "installing-instana-server-components-patches-for-core"
-echo "installing-instana-server-components-patches-for-units"
 
 echo "==========================================================="
 echo "----> Once it's fully ready, try this command to see how to access it:"

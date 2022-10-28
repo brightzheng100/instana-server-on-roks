@@ -99,9 +99,9 @@ function installing-instana-server-components-secret-instana-core {
   # dhParams
   openssl dhparam -out _wip/dhparams.pem 2048
   # An key for signing/validating messages exchanged with the IDP must be configured. 
-  # Unencrypted keys won't be accepted so we use Passw0rd as the pass phrase
-  openssl genrsa -aes128 -out _wip/key.pem -passout pass:Passw0rd 2048
-  openssl req -new -x509 -key _wip/key.pem -out _wip/cert.pem -passin pass:Passw0rd -days 365 \
+  # Unencrypted keys won't be accepted
+  openssl genrsa -aes128 -out _wip/key.pem -passout pass:"${INSTANA_KEY_PASSPHRASE}" 2048
+  openssl req -new -x509 -key _wip/key.pem -out _wip/cert.pem -passin pass:"${INSTANA_KEY_PASSPHRASE}" -days 365 \
   -subj "/C=SG/ST=SG/L=SG/O=IBM/OU=AIOps/CN=ibm.com"
   cat _wip/key.pem _wip/cert.pem > _wip/sp.pem
 
@@ -130,7 +130,7 @@ tokenSecret: mytokensecret
 # SAML/OIDC configuration
 serviceProviderConfig:
   # Password for the key/cert file
-  keyPassword: passw0rd
+  keyPassword: "${INSTANA_KEY_PASSPHRASE}"
   # The combined key/cert file
   pem:
 # Required if a proxy is configured that needs authentication
@@ -153,7 +153,7 @@ EOF
 
   # Prepare the core config file
   dhparams="`cat _wip/dhparams.pem`" && \
-  sp_keyPassword="Passw0rd" && \
+  sp_keyPassword="${INSTANA_KEY_PASSPHRASE}" && \
   sp_pem="`cat _wip/sp.pem`" && \
   yq -i "
     .adminPassword = \"${INSTANA_ADMIN_PWD}\" |
@@ -487,6 +487,7 @@ if [ -z "${INSTANA_AGENT_KEY}" ] | \
    [ -z "${INSTANA_SALES_KEY}" ] | \
    [ -z "${INSTANA_ADMIN_USER}" ] | \
    [ -z "${INSTANA_ADMIN_PWD}" ] | \
+   [ -z "${INSTANA_KEY_PASSPHRASE}" ] | \
    [ -z "${SPANS_STORAGE_CLASS}" ] | \
    [ -z "${INSTANA_DATASTORE_HOST_FQDN}" ]; then 
   echo "ERROR: You must export ALL required variables prior to run the command. For example"
@@ -496,6 +497,7 @@ if [ -z "${INSTANA_AGENT_KEY}" ] | \
   echo "export INSTANA_SALES_KEY=xxxxxxxxxxxxxxxx"
   echo "export INSTANA_ADMIN_USER=admin@instana.local"
   echo "export INSTANA_ADMIN_PWD=Passw0rd"
+  echo "export INSTANA_KEY_PASSPHRASE=Passw0rd"
   echo "export SPANS_STORAGE_CLASS=ibmc-file-gold-gid"
   echo "export INSTANA_DATASTORE_HOST_FQDN=168.1.53.248.nip.io"
   return 1
@@ -525,6 +527,7 @@ echo "----> INSTANA_DOWNLOAD_KEY=${INSTANA_DOWNLOAD_KEY}"
 echo "----> INSTANA_SALES_KEY=${INSTANA_SALES_KEY}"
 echo "----> INSTANA_ADMIN_USER=${INSTANA_ADMIN_USER}"
 echo "----> INSTANA_ADMIN_PWD=${INSTANA_ADMIN_PWD}"
+echo "----> INSTANA_KEY_PASSPHRASE=${INSTANA_KEY_PASSPHRASE}"
 echo "----> SPANS_STORAGE_CLASS=${SPANS_STORAGE_CLASS}"
 echo "----> INSTANA_DATASTORE_HOST_FQDN=${INSTANA_DATASTORE_HOST_FQDN}"
 

@@ -321,6 +321,8 @@ export INSTANA_SALES_KEY="<INSTANA SALES KEY>"
 export INSTANA_ADMIN_USER="admin@instana.local"
 # Instana's initial password for admin to log into UI
 export INSTANA_ADMIN_PWD="Passw0rd"
+# Instana's cert pass phrase, whatever you want to set
+export INSTANA_KEY_PASSPHRASE="Passw0rd"
 # RWX-based storage class for spans
 export SPANS_STORAGE_CLASS="ibmc-file-gold-gid"
 # Instana's datastore VM's FQDN, or exposed IP, refer to Preparation for Part 1
@@ -493,9 +495,9 @@ Prepare some keys:
 openssl dhparam -out _wip/dhparams.pem 2048
 
 # An key for signing/validating messages exchanged with the IDP must be configured. 
-# Unencrypted keys won't be accepted so we use Passw0rd as the pass phrase
-openssl genrsa -aes128 -out _wip/key.pem -passout pass:Passw0rd 2048
-openssl req -new -x509 -key _wip/key.pem -out _wip/cert.pem -passin pass:Passw0rd -days 365 \
+# Unencrypted keys won't be accepted
+openssl genrsa -aes128 -out _wip/key.pem -passout pass:"${INSTANA_KEY_PASSPHRASE}" 2048
+openssl req -new -x509 -key _wip/key.pem -out _wip/cert.pem -passin pass:"${INSTANA_KEY_PASSPHRASE}" -days 365 \
   -subj "/C=SG/ST=SG/L=SG/O=IBM/OU=AIOps/CN=ibm.com"
 cat _wip/key.pem _wip/cert.pem > _wip/sp.pem
 ```
@@ -526,7 +528,7 @@ tokenSecret: mytokensecret
 # SAML/OIDC configuration
 serviceProviderConfig:
   # Password for the key/cert file
-  keyPassword: passw0rd
+  keyPassword: "${INSTANA_KEY_PASSPHRASE}"
   # The combined key/cert file
   pem:
 # Required if a proxy is configured that needs authentication
@@ -553,7 +555,7 @@ EOF
 #   yq (https://github.com/mikefarah/yq/) version 4.27.5
 # Prepare the core config file
 $ dhparams="`cat _wip/dhparams.pem`" && \
-  sp_keyPassword="Passw0rd" && \
+  sp_keyPassword="${INSTANA_KEY_PASSPHRASE}" && \
   sp_pem="`cat _wip/sp.pem`" && \
   yq -i "
   .adminPassword = \"${INSTANA_ADMIN_PWD}\" |

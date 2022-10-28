@@ -339,6 +339,10 @@ After exporting the required abovementioned variables, we can run through these 
 > Note: even we can run all these in some shot, I'd strongly recommend you do that command by command so that you have a better chance to fix the potential issues before proceeding. And you may need to wait for a while, or have a retry, between the commands as some commands really take some time to finish.
 
 ```sh
+# Git clone the repo, if you haven't yet
+git clone https://github.com/brightzheng100/instana-server-on-roks.git
+cd instana-server-on-roks
+
 # Source the file
 source 2-roks.sh
 

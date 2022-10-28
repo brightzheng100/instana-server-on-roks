@@ -294,6 +294,16 @@ cassandra:          	Major:4 	min. Minor:0
 clickhouse:         	Major:22 	min. Minor:3
 ```
 
+#### Install other required tools
+
+There are some handy tools required as well.
+
+Please install them accordingly:
+- [oc](https://docs.openshift.com/container-platform/4.11/cli_reference/openshift_cli/getting-started-cli.html)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+- [yq](https://github.com/mikefarah/yq)
+- openssl
+
 #### Export ALL required variables
 
 ```sh

@@ -323,14 +323,9 @@ export INSTANA_ADMIN_USER="admin@instana.local"
 export INSTANA_ADMIN_PWD="Passw0rd"
 # RWX-based storage class for spans
 export SPANS_STORAGE_CLASS="ibmc-file-gold-gid"
-# Instana's datastore VM's FQDN, see below note for how
-export INSTANA_DATASTORE_HOST_FQDN="<INSTANA DATASTORE VM'S FQDN, e.g 168.1.53.248.nip.io>"
-# Instana's datastore VM's public IP
-export INSTANA_DATASTORE_HOST_IP="<INSTANA DATASTORE VM'S EXPOSED IP, e.g 168.1.53.248>"
+# Instana's datastore VM's FQDN, or exposed IP, refer to Preparation for Part 1
+export INSTANA_DATASTORE_HOST_FQDN="<INSTANA DATASTORE VM'S FQDN OR EXPOSED IP, e.g 168.1.53.248.nip.io>"
 ```
-
-> Note: For the `INSTANA_DATASTORE_HOST_FQDN`, the simplest way is to retrieve it by running `hostname` command in the previous Instana Datastore VM, or you may add an A record in your DNS system to map a FQDN to the VM's public IP.
-
 
 ### The TL;DR Guide for Part 2
 
@@ -685,19 +680,19 @@ spec:
   datastoreConfigs:
     cassandraConfigs:
       - hosts:
-          - ${INSTANA_DATASTORE_HOST_IP}
+          - ${INSTANA_DATASTORE_HOST_FQDN}
         ports:
           - name: tcp
             port: 9042
     cockroachdbConfigs:
       - hosts:
-          - ${INSTANA_DATASTORE_HOST_IP}
+          - ${INSTANA_DATASTORE_HOST_FQDN}
         ports:
           - name: tcp
             port: 26257
     clickhouseConfigs:
       - hosts:
-          - ${INSTANA_DATASTORE_HOST_IP}
+          - ${INSTANA_DATASTORE_HOST_FQDN}
         ports:
           - name: tcp
             port: 9000
@@ -705,7 +700,7 @@ spec:
             port: 8123
     elasticsearchConfig:
       hosts:
-        - ${INSTANA_DATASTORE_HOST_IP}
+        - ${INSTANA_DATASTORE_HOST_FQDN}
       ports:
         - name: tcp
           port: 9300
@@ -713,7 +708,7 @@ spec:
           port: 9200
     kafkaConfig:
       hosts:
-        - ${INSTANA_DATASTORE_HOST_IP}
+        - ${INSTANA_DATASTORE_HOST_FQDN}
       ports:
         - name: tcp
           port: 9092

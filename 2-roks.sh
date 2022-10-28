@@ -283,19 +283,19 @@ spec:
   datastoreConfigs:
     cassandraConfigs:
       - hosts:
-          - ${INSTANA_DATASTORE_HOST_IP}
+          - ${INSTANA_DATASTORE_HOST_FQDN}
         ports:
           - name: tcp
             port: 9042
     cockroachdbConfigs:
       - hosts:
-          - ${INSTANA_DATASTORE_HOST_IP}
+          - ${INSTANA_DATASTORE_HOST_FQDN}
         ports:
           - name: tcp
             port: 26257
     clickhouseConfigs:
       - hosts:
-          - ${INSTANA_DATASTORE_HOST_IP}
+          - ${INSTANA_DATASTORE_HOST_FQDN}
         ports:
           - name: tcp
             port: 9000
@@ -303,7 +303,7 @@ spec:
             port: 8123
     elasticsearchConfig:
       hosts:
-        - ${INSTANA_DATASTORE_HOST_IP}
+        - ${INSTANA_DATASTORE_HOST_FQDN}
       ports:
         - name: tcp
           port: 9300
@@ -311,7 +311,7 @@ spec:
           port: 9200
     kafkaConfig:
       hosts:
-        - ${INSTANA_DATASTORE_HOST_IP}
+        - ${INSTANA_DATASTORE_HOST_FQDN}
       ports:
         - name: tcp
           port: 9092
@@ -397,7 +397,7 @@ function installing-instana-server-components-patches-for-core {
 
   # The patch string
   local patch_string="[
-            {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
+            {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_FQDN}\"}]}
           ]"
 
   # Acceptor
@@ -449,7 +449,7 @@ function installing-instana-server-components-patches-for-units {
   
   # The patch string
   local patch_string="[
-            {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_IP}\"}]}
+            {\"op\":\"add\",\"path\":\"/spec/template/spec/hostAliases\",\"value\":[{\"hostnames\":[\"${INSTANA_DATASTORE_HOST_FQDN}\"],\"ip\":\"${INSTANA_DATASTORE_HOST_FQDN}\"}]}
           ]"
 
   # tu-tenant0-unit0-appdata-legacy-converter
@@ -488,8 +488,7 @@ if [ -z "${INSTANA_AGENT_KEY}" ] | \
    [ -z "${INSTANA_ADMIN_USER}" ] | \
    [ -z "${INSTANA_ADMIN_PWD}" ] | \
    [ -z "${SPANS_STORAGE_CLASS}" ] | \
-   [ -z "${INSTANA_DATASTORE_HOST_FQDN}" ] | \
-   [ -z "${INSTANA_DATASTORE_HOST_IP}" ]; then 
+   [ -z "${INSTANA_DATASTORE_HOST_FQDN}" ]; then 
   echo "ERROR: You must export ALL required variables prior to run the command. For example"
   echo "==========================================================="
   echo "export INSTANA_AGENT_KEY=xxxxxxxxxxxxx"
@@ -498,8 +497,7 @@ if [ -z "${INSTANA_AGENT_KEY}" ] | \
   echo "export INSTANA_ADMIN_USER=admin@instana.local"
   echo "export INSTANA_ADMIN_PWD=Passw0rd"
   echo "export SPANS_STORAGE_CLASS=ibmc-file-gold-gid"
-  echo "export INSTANA_DATASTORE_HOST_FQDN=itz-550004ghs4-ibcl.dte.demo.ibmcloud.com"
-  echo "export INSTANA_DATASTORE_HOST_IP=168.1.53.216"
+  echo "export INSTANA_DATASTORE_HOST_FQDN=168.1.53.248.nip.io"
   return 1
 fi
 
@@ -529,7 +527,6 @@ echo "----> INSTANA_ADMIN_USER=${INSTANA_ADMIN_USER}"
 echo "----> INSTANA_ADMIN_PWD=${INSTANA_ADMIN_PWD}"
 echo "----> SPANS_STORAGE_CLASS=${SPANS_STORAGE_CLASS}"
 echo "----> INSTANA_DATASTORE_HOST_FQDN=${INSTANA_DATASTORE_HOST_FQDN}"
-echo "----> INSTANA_DATASTORE_HOST_IP=${INSTANA_DATASTORE_HOST_IP}"
 
 ## Let's orchestrate the process here
 # installing-instana-operator

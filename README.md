@@ -1,5 +1,7 @@
 # Instana Server on ROKS
 
+> NOTE: This repo has been deprecated, refer to https://github.com/brightzheng100/instana-server-on-k8s instead.
+
 Instana offers SaaS by default, and also offers flexible non-SaaS deployment patterns, so we can deploy it within a single VM, dual-VM, or even Kubernetes.
 
 TechZone is IBM's killer sandbox where IBMers and its Business Partners can easily provision a VM, a Kubernetes/OpenShift cluster, or even a very complex environment on demand for purposes like self-learning, POCs/POVs.
